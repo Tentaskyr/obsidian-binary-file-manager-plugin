@@ -101,19 +101,20 @@ export class MetaDataGenerator {
 		// process by Templater
 		const templaterPlugin = await this.getTemplaterPlugin();
 		const binaryFileName = binaryFile.basename+"."+binaryFile.extension;
+		const moveToFullFilePath = attachmentsFilePath+"/"+binaryFileName;
 		if (!(this.plugin.settings.useTemplater && templaterPlugin)) {
 			this.app.vault.create(
 				metaDataFilePath,
 				this.plugin.formatter.format(
 					templateContent,
-					(attachmentsFilePath+"/"+binaryFileName),
+					moveToFullFilePath,
 					binaryFile.stat.ctime
 				)
 			);
 
 			// move binary file into attachments folder
 			try {
-				await this.app.fileManager.renameFile(binaryFile, (attachmentsFilePath+"/"+binaryFileName));
+				await this.app.fileManager.renameFile(binaryFile, moveToFullFilePath);
 			} catch (err) {
 				alert(err);
 			}
