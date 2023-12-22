@@ -115,6 +115,7 @@ export class MetaDataGenerator {
 			// move binary file into attachments folder
 			try {
 				await this.app.fileManager.renameFile(binaryFile, moveToFullFilePath);
+				new Notice(`Binary file of ${binaryFileName} has been moved.`);
 			} catch (err) {
 				alert(err);
 			}
