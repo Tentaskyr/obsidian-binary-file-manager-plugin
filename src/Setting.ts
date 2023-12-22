@@ -40,7 +40,35 @@ export class BinaryFileManagerSettingTab extends PluginSettingTab {
 			});
 
 		new Setting(containerEl)
-			.setName('New file location')
+			.setName('Watched folder')
+			.setDesc('Only this folder will be watched for new files (subfolders will not be watched)')
+			.addSearch((component) => {
+				new FolderSuggest(this.app, component.inputEl);
+				component
+					.setPlaceholder('Example: folder1/folder2')
+					.setValue(this.plugin.settings.binaryFilePath)
+					.onChange((newFolder) => {
+						this.plugin.settings.binaryFilePath = newFolder;
+						this.plugin.saveSettings();
+					});
+			});
+
+		new Setting(containerEl)
+			.setName('Attachments folder')
+			.setDesc('Binary files will be moved here after metadata creation')
+			.addSearch((component) => {
+				new FolderSuggest(this.app, component.inputEl);
+				component
+					.setPlaceholder('Example: folder1/folder2')
+					.setValue(this.plugin.settings.attachmentsFilePath)
+					.onChange((newFolder) => {
+						this.plugin.settings.attachmentsFilePath = newFolder;
+						this.plugin.saveSettings();
+					});
+			});
+
+		new Setting(containerEl)
+			.setName('Metadata location')
 			.setDesc('New metadata file will be placed here')
 			.addSearch((component) => {
 				new FolderSuggest(this.app, component.inputEl);

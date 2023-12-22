@@ -35,6 +35,17 @@ export class MetaDataGenerator {
 			return false;
 		}
 
+		let filePath = file.path.toString();
+		let folderPath = filePath.substring(0,filePath.lastIndexOf("/"));
+
+		if (
+			!(folderPath === (
+				normalizePath(this.plugin.settings.binaryFilePath)
+			))
+		) {
+			return false;
+		}
+
 		const matchedExtension =
 			this.plugin.fileExtensionManager.getExtensionMatchedBest(file.name);
 		if (!matchedExtension) {
@@ -79,11 +90,49 @@ export class MetaDataGenerator {
 		}
 	}
 
+	private uniquefyBinaryFileName(binaryFileName: string): string {
+		const binaryFilePath = normalizePath(
+			`${this.plugin.settings.folder}/${binaryFileName}`
+		);
+		const attachmentsFilePath = `${this.plugin.settings.attachmentsFilePath}`;
+		const attachmentFullFilePath = attachmentsFilePath+"/"+binaryFileName;
+		if (this.app.vault.getAbstractFileByPath(attachmentFullFilePath)) {
+			return `CONFLICT-${moment().format(
+				'YYYY-MM-DD-hh-mm-ss'
+			)}-${binaryFileName}`;
+		} else {
+			return binaryFileName;
+		}
+	}
+
+	private async moveBinaryFile(
+    binaryFile: TFile
+	): Promise<void> {
+
+		const binaryFileName = this.uniquefyBinaryFileName(
+			binaryFile.basename+"."+binaryFile.extension
+		);
+
+		// move binary file into attachments folder
+		const attachmentsFilePath = `${this.plugin.settings.attachmentsFilePath}`;
+		//const binaryFileName = binaryFile.basename+"."+binaryFile.extension;
+		const fullFilePath = attachmentsFilePath+"/"+binaryFileName;
+		try {
+			await this.app.fileManager.renameFile(binaryFile, fullFilePath);
+			new Notice(`Binary file of ${binaryFileName} has been moved.`);
+		} catch (err) {
+			alert(err);
+		}
+	}
+
 	private async createMetaDataFile(
 		metaDataFilePath: string,
 		binaryFile: TFile
 	): Promise<void> {
 		const templateContent = await this.fetchTemplateContent();
+		const attachmentsFilePath = `${this.plugin.settings.attachmentsFilePath}`;
+		const binaryFileName = binaryFile.basename+"."+binaryFile.extension;
+		const fullFilePath = attachmentsFilePath+"/"+binaryFileName;
 
 		// process by Templater
 		const templaterPlugin = await this.getTemplaterPlugin();
@@ -92,10 +141,17 @@ export class MetaDataGenerator {
 				metaDataFilePath,
 				this.plugin.formatter.format(
 					templateContent,
-					binaryFile.path,
+					fullFilePath,
 					binaryFile.stat.ctime
 				)
 			);
+
+			try {
+				await this.moveBinaryFile(binaryFile);
+			} catch(err) {
+				alert(err);
+			}
+
 		} else {
 			const targetFile = await this.app.vault.create(
 				metaDataFilePath,
@@ -181,5 +237,29 @@ export class MetaDataGenerator {
 		});
 
 		return unlinkedBinaries;
+	}
+
+	findLinkedBinaries(): TFile[] {
+		const linkedBinaries: TFile[] = [];
+		const linkedPaths = new Set<string>();
+
+		// collect all link destinations
+		Object.values(this.app.metadataCache.resolvedLinks).forEach((links) => {
+			Object.keys(links).forEach((dest) => {
+				linkedPaths.add(dest);
+			});
+		});
+
+		// collect only unlinked binaries
+		this.app.vault.getFiles().forEach((file) => {
+			const isUnlinkedBinary =
+				!linkedPaths.has(file.path) &&
+				this.plugin.fileExtensionManager.verify(file.path);
+			if (!isUnlinkedBinary) {
+				linkedBinaries.push(file);
+			}
+		});
+
+		return linkedBinaries;
 	}
 }

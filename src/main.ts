@@ -1,4 +1,4 @@
-import { Notice, Plugin, TAbstractFile, TFile } from 'obsidian';
+import { FileManager, Notice, Plugin, TAbstractFile, TFile } from 'obsidian';
 import { Formatter } from 'Formatter';
 import { BinaryFileManagerSettingTab } from 'Setting';
 import { FileExtensionManager } from 'Extension';
@@ -9,6 +9,8 @@ interface BinaryFileManagerSettings {
 	autoDetection: boolean;
 	extensions: string[];
 	folder: string;
+	binaryFilePath: string;
+	attachmentsFilePath: string;
 	filenameFormat: string;
 	templatePath: string;
 	useTemplater: boolean;
@@ -36,6 +38,8 @@ const DEFAULT_SETTINGS: BinaryFileManagerSettings = {
 		'pdf',
 	],
 	folder: '/',
+	binaryFilePath: '/',
+	attachmentsFilePath: '/',
 	filenameFormat: 'INFO_{{NAME}}_{{EXTENSION:UP}}',
 	templatePath: '',
 	useTemplater: false,
