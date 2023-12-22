@@ -65,7 +65,6 @@ export class MetaDataGenerator {
 		);
 		const metaDataFilePath = `${this.plugin.settings.folder}/${metaDataFileName}`;
 
-
 		await this.createMetaDataFile(metaDataFilePath, file as TFile);
 	}
 
@@ -91,12 +90,32 @@ export class MetaDataGenerator {
 		}
 	}
 
+	private uniquefyBinaryFileName(binaryFileName: string): string {
+		const binaryFilePath = normalizePath(
+			`${this.plugin.settings.folder}/${binaryFileName}`
+		);
+		const attachmentsFilePath = `${this.plugin.settings.attachmentsFilePath}`;
+		const attachmentFullFilePath = attachmentsFilePath+"/"+binaryFileName;
+		if (this.app.vault.getAbstractFileByPath(attachmentFullFilePath)) {
+			return `CONFLICT-${moment().format(
+				'YYYY-MM-DD-hh-mm-ss'
+			)}-${binaryFileName}`;
+		} else {
+			return binaryFileName;
+		}
+	}
+
 	private async moveBinaryFile(
     binaryFile: TFile
 	): Promise<void> {
+
+		const binaryFileName = this.uniquefyBinaryFileName(
+			binaryFile.basename+"."+binaryFile.extension
+		);
+
 		// move binary file into attachments folder
 		const attachmentsFilePath = `${this.plugin.settings.attachmentsFilePath}`;
-		const binaryFileName = binaryFile.basename+"."+binaryFile.extension;
+		//const binaryFileName = binaryFile.basename+"."+binaryFile.extension;
 		const fullFilePath = attachmentsFilePath+"/"+binaryFileName;
 		try {
 			await this.app.fileManager.renameFile(binaryFile, fullFilePath);
