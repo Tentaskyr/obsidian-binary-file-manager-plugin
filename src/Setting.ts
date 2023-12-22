@@ -68,7 +68,7 @@ export class BinaryFileManagerSettingTab extends PluginSettingTab {
 			});
 
 		new Setting(containerEl)
-			.setName('New file location')
+			.setName('Metadata location')
 			.setDesc('New metadata file will be placed here')
 			.addSearch((component) => {
 				new FolderSuggest(this.app, component.inputEl);
