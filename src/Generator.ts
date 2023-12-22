@@ -64,8 +64,9 @@ export class MetaDataGenerator {
 			this.generateMetaDataFileName(file)
 		);
 		const metaDataFilePath = `${this.plugin.settings.folder}/${metaDataFileName}`;
+		const attachmentsFilePath = `${this.plugin.settings.attachmentsFilePath}`;
 
-		await this.createMetaDataFile(metaDataFilePath, file as TFile);
+		await this.createMetaDataFile(metaDataFilePath, file as TFile, attachmentsFilePath);
 	}
 
 	private generateMetaDataFileName(file: TFile): string {
@@ -92,7 +93,8 @@ export class MetaDataGenerator {
 
 	private async createMetaDataFile(
 		metaDataFilePath: string,
-		binaryFile: TFile
+		binaryFile: TFile,
+		attachmentsFilePath: string
 	): Promise<void> {
 		const templateContent = await this.fetchTemplateContent();
 
@@ -107,6 +109,16 @@ export class MetaDataGenerator {
 					binaryFile.stat.ctime
 				)
 			);
+
+			// move binary file into attachments folder
+			let binaryFileName = binaryFile.basename+"."+binaryFile.extension;
+
+			try {
+				await this.app.fileManager.renameFile(binaryFile, (attachmentsFilePath+"/"+binaryFileName));
+			} catch (err) {
+				alert(err);
+			}
+
 		} else {
 			const targetFile = await this.app.vault.create(
 				metaDataFilePath,
@@ -192,5 +204,29 @@ export class MetaDataGenerator {
 		});
 
 		return unlinkedBinaries;
+	}
+
+	findLinkedBinaries(): TFile[] {
+		const linkedBinaries: TFile[] = [];
+		const linkedPaths = new Set<string>();
+
+		// collect all link destinations
+		Object.values(this.app.metadataCache.resolvedLinks).forEach((links) => {
+			Object.keys(links).forEach((dest) => {
+				linkedPaths.add(dest);
+			});
+		});
+
+		// collect only unlinked binaries
+		this.app.vault.getFiles().forEach((file) => {
+			const isUnlinkedBinary =
+				!linkedPaths.has(file.path) &&
+				this.plugin.fileExtensionManager.verify(file.path);
+			if (!isUnlinkedBinary) {
+				linkedBinaries.push(file);
+			}
+		});
+
+		return linkedBinaries;
 	}
 }

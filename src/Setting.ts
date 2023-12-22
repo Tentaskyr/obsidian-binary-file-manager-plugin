@@ -132,6 +132,20 @@ export class BinaryFileManagerSettingTab extends PluginSettingTab {
 					});
 			});
 
+			new Setting(containerEl)
+				.setName('Attachments folder')
+				.setDesc('Binary files will be moved here after metadata creation')
+				.addSearch((component) => {
+					new FolderSuggest(this.app, component.inputEl);
+					component
+						.setPlaceholder('Example: folder1/folder2')
+						.setValue(this.plugin.settings.attachmentsFilePath)
+						.onChange((newFolder) => {
+							this.plugin.settings.attachmentsFilePath = newFolder;
+							this.plugin.saveSettings();
+						});
+				});
+
 		let extensionToBeAdded: string;
 		new Setting(containerEl)
 			.setName('Extension to be watched')
