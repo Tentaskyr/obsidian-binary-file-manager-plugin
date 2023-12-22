@@ -119,8 +119,8 @@ export class BinaryFileManagerSettingTab extends PluginSettingTab {
 			});
 
 		new Setting(containerEl)
-			.setName('Binary file parent folder')
-			.setDesc('Only this folder will be watched for new files')
+			.setName('Watched folder')
+			.setDesc('Only this folder will be watched for new files (subfolders will not be watched)')
 			.addSearch((component) => {
 				new FolderSuggest(this.app, component.inputEl);
 				component
