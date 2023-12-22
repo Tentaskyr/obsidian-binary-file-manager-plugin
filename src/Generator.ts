@@ -34,10 +34,14 @@ export class MetaDataGenerator {
 		if (!(file instanceof TFile)) {
 			return false;
 		}
+
+		let filePath = file.path.toString();
+		let folderPath = filePath.substring(0,filePath.lastIndexOf("/"));
+
 		if (
-			!file.path.startsWith(
+			!(folderPath === (
 				normalizePath(this.plugin.settings.binaryFilePath)
-			)
+			))
 		) {
 			return false;
 		}
