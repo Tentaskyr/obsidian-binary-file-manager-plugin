@@ -1,4 +1,6 @@
-## Binary File Manager Plugin
+## Obsidian Binary File Manager
+
+![GitHub manifest version (path)](https://img.shields.io/github/manifest-json/v/willjasen/obsidian-binary-file-manager-plugin)
 
 This plugin detects new binary files in the vault and creates markdown files with metadata. The new binary file can then be moved into a different directory, like attachments.
 
