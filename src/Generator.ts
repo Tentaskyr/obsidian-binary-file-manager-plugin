@@ -64,9 +64,9 @@ export class MetaDataGenerator {
 			this.generateMetaDataFileName(file)
 		);
 		const metaDataFilePath = `${this.plugin.settings.folder}/${metaDataFileName}`;
-		const attachmentsFilePath = `${this.plugin.settings.attachmentsFilePath}`;
 
-		await this.createMetaDataFile(metaDataFilePath, file as TFile, attachmentsFilePath);
+
+		await this.createMetaDataFile(metaDataFilePath, file as TFile);
 	}
 
 	private generateMetaDataFileName(file: TFile): string {
@@ -91,32 +91,45 @@ export class MetaDataGenerator {
 		}
 	}
 
+	private async moveBinaryFile(
+    binaryFile: TFile
+	): Promise<void> {
+		// move binary file into attachments folder
+		const attachmentsFilePath = `${this.plugin.settings.attachmentsFilePath}`;
+		const binaryFileName = binaryFile.basename+"."+binaryFile.extension;
+		const fullFilePath = attachmentsFilePath+"/"+binaryFileName;
+		try {
+			await this.app.fileManager.renameFile(binaryFile, fullFilePath);
+			new Notice(`Binary file of ${binaryFileName} has been moved.`);
+		} catch (err) {
+			alert(err);
+		}
+	}
+
 	private async createMetaDataFile(
 		metaDataFilePath: string,
-		binaryFile: TFile,
-		attachmentsFilePath: string
+		binaryFile: TFile
 	): Promise<void> {
 		const templateContent = await this.fetchTemplateContent();
+		const attachmentsFilePath = `${this.plugin.settings.attachmentsFilePath}`;
+		const binaryFileName = binaryFile.basename+"."+binaryFile.extension;
+		const fullFilePath = attachmentsFilePath+"/"+binaryFileName;
 
 		// process by Templater
 		const templaterPlugin = await this.getTemplaterPlugin();
-		const binaryFileName = binaryFile.basename+"."+binaryFile.extension;
-		const moveToFullFilePath = attachmentsFilePath+"/"+binaryFileName;
 		if (!(this.plugin.settings.useTemplater && templaterPlugin)) {
 			this.app.vault.create(
 				metaDataFilePath,
 				this.plugin.formatter.format(
 					templateContent,
-					moveToFullFilePath,
+					fullFilePath,
 					binaryFile.stat.ctime
 				)
 			);
 
-			// move binary file into attachments folder
 			try {
-				await this.app.fileManager.renameFile(binaryFile, moveToFullFilePath);
-				new Notice(`Binary file of ${binaryFileName} has been moved.`);
-			} catch (err) {
+				await this.moveBinaryFile(binaryFile);
+			} catch(err) {
 				alert(err);
 			}
 
