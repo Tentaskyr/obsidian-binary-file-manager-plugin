@@ -9,6 +9,6 @@ npm i;
 npm run build;
 
 # Copy built files into the plugin directory
-cp "$SOURCE_DIR/main.js" "$PLUGIN_DIR/main.js";
-cp $SOURCE_DIR/manifest.json $PLUGIN_DIR/manifest.json
-cp $SOURCE_DIR/styles.css $PLUGIN_DIR/styles.css
+cp $SOURCE_DIR/main.js $PLUGIN_DIR/main.js;
+cp $SOURCE_DIR/manifest.json $PLUGIN_DIR/manifest.json;
+cp $SOURCE_DIR/styles.css $PLUGIN_DIR/styles.css;
