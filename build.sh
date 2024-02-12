@@ -8,6 +8,9 @@ SOURCE_DIR="/Users/willjasen/GitHub/obsidian-binary-file-manager-plugin";
 PLUGIN_DIR="/Users/willjasen/Obsidian/willjasen/.obsidian/plugins/obsidian-binary-file-manager-plugin";
 FILES=( "main.js" "manifest.json" "styles.css" );
 
+# Create the directory if needed
+[ -d $PLUGIN_DIR ] || mkdir $PLUGIN_DIR
+
 # Go to the source directory and build it
 cd $SOURCE_DIR;
 npm i; npm run build;
