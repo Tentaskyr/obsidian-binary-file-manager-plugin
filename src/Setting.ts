@@ -122,6 +122,41 @@ export class BinaryFileManagerSettingTab extends PluginSettingTab {
 			});
 		});
 
+		let tagToBeAdded: string;
+		new Setting(containerEl)
+			.setName('Tags to add')
+			.addText((text) =>
+				text.setPlaceholder('Example: scan').onChange((value) => {
+					tagToBeAdded = value.trim().replace(/^\./, '');
+				})
+			)
+			.addButton((cb) => {
+				cb.setButtonText('Add').onClick(async () => {
+					if (
+						this.plugin.settings.tags.has(tagToBeAdded)
+					) {
+						new Notice(
+							`${tagToBeAdded} is already registered`
+						);
+						return;
+					}
+					this.plugin.settings.tags.push(tagToBeAdded);
+					await this.plugin.saveSettings();
+					this.display();
+				});
+			});
+
+		this.plugin.settings.tags.forEach((tag) => {
+			new Setting(containerEl).setName(tag).addExtraButton((cb) => {
+				cb.setIcon('cross').onClick(async () => {
+					let index = this.plugin.settings.tags.indexOf(tag);
+					let removedElementsArray = this.plugin.settings.tags.splice(index, 1);
+					await this.plugin.saveSettings();
+					this.display();
+				});
+			});
+		});
+
 		new Setting(containerEl)
 			.setName('Template file location')
 			.addSearch((component) => {
