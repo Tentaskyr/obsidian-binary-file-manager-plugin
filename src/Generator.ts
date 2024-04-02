@@ -12,13 +12,12 @@ import { UncoveredApp } from 'Uncover';
 import { retry } from 'Util';
 
 const TEMPLATER_PLUGIN_NAME = 'templater-obsidian';
-const DEFAULT_TEMPLATE_CONTENT = `
----
+const DEFAULT_TEMPLATE_CONTENT = `---
 tags:
   - scanned-in
 ---
 LINK: [[{{PATH}}]]
-CREATED At: {{CDATE:YYYY-MM-DD}}
+CREATED AT: {{CDATE:YYYY-MM-DD}}
 FILE TYPE: {{EXTENSION:UP}}
 ![[{{PATH}}]]
 `;
