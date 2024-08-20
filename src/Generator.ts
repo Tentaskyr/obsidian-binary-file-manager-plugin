@@ -9,7 +9,7 @@ import {
 	Plugin,
 } from 'obsidian';
 import { UncoveredApp } from 'Uncover';
-import { retry } from 'Util';
+import { retry, sleep } from 'Util';
 
 const TEMPLATER_PLUGIN_NAME = 'templater-obsidian';
 const DEFAULT_TEMPLATE_CONTENT = ``;
@@ -125,6 +125,9 @@ export class MetaDataGenerator {
 		metaDataFilePath: string,
 		binaryFile: TFile
 	): Promise<void> {
+
+		await sleep(5000);
+
 		const templateContent = await this.fetchTemplateContent();
 		const attachmentsFilePath = `${this.plugin.settings.attachmentsFilePath}`;
 		const binaryFileName = binaryFile.basename+"."+binaryFile.extension;
