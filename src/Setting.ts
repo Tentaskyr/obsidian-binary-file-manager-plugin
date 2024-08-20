@@ -122,6 +122,17 @@ export class BinaryFileManagerSettingTab extends PluginSettingTab {
 			});
 		});
 
+		this.plugin.settings.tags.forEach((tag) => {
+			new Setting(containerEl).setName(tag).addExtraButton((cb) => {
+				cb.setIcon('cross').onClick(async () => {
+					let index = this.plugin.settings.tags.indexOf(tag);
+					let removedElementsArray = this.plugin.settings.tags.splice(index, 1);
+					await this.plugin.saveSettings();
+					this.display();
+				});
+			});
+		});
+
 		new Setting(containerEl)
 			.setName('Template file location')
 			.addSearch((component) => {
