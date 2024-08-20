@@ -12,27 +12,7 @@ import { UncoveredApp } from 'Uncover';
 import { retry } from 'Util';
 
 const TEMPLATER_PLUGIN_NAME = 'templater-obsidian';
-
-const TEMPLATE_PART_1 =
-`---
-tags:`;
-
-let TEMPLATE_PART_2: string[] = '';
-this.plugin.settings.tags.forEach(function tag) {
-	`${TEMPLATE_PART_2}
-	  - ${tag}`;
-});
-
-const TEMPLATE_PART_3 =
-`
----
-LINK: [[{{PATH}}]]
-CREATED AT: {{CDATE:YYYY-MM-DD}}
-FILE TYPE: {{EXTENSION:UP}}
-![[{{PATH}}]]
-`;
-
-const DEFAULT_TEMPLATE_CONTENT = `${TEMPLATE_PART_1}${TEMPLATE_PART_2}${TEMPLATE_PART_3}`;
+const DEFAULT_TEMPLATE_CONTENT = ``;
 
 const RETRY_NUMBER = 1000;
 const TIMEOUT_MILLISECOND = 1000;

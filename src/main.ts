@@ -14,7 +14,6 @@ interface BinaryFileManagerSettings {
 	filenameFormat: string;
 	templatePath: string;
 	useTemplater: boolean;
-	tags: string[];
 }
 
 const DEFAULT_SETTINGS: BinaryFileManagerSettings = {
@@ -43,8 +42,7 @@ const DEFAULT_SETTINGS: BinaryFileManagerSettings = {
 	attachmentsFilePath: '/',
 	filenameFormat: 'INFO_{{NAME}}_{{EXTENSION:UP}}',
 	templatePath: '',
-	useTemplater: false,
-	tags: [],
+	useTemplater: false
 };
 
 export default class BinaryFileManagerPlugin extends Plugin {
