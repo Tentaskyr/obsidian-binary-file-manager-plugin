@@ -9,11 +9,15 @@ PLUGIN_DIR="/Users/willjasen/Obsidian/willjasen/.obsidian/plugins/obsidian-binar
 FILES=( "main.js" "manifest.json" "styles.css" );
 
 # Create the directory if needed
-[ -d $PLUGIN_DIR ] || echo "Creating plugin directory at $PLUGIN_DIR"; mkdir $PLUGIN_DIR;
+if [ -d $PLUGIN_DIR ]; then 
+  echo "Plugin directory already exists.";
+else
+  echo "Creating plugin directory at $PLUGIN_DIR"; mkdir $PLUGIN_DIR;
+fi
 
-# Go to the source directory and build it
+# Go to the source directory and build this plugin
 cd $SOURCE_DIR;
-npm i; npm run build;
+npm i --silent; npm run build > /dev/null 2>&1;
 
 # Copy built files into the plugin directory
 for file in "${FILES[@]}"
