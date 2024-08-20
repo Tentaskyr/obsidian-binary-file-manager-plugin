@@ -18,7 +18,7 @@ npm i; npm run build;
 # Copy built files into the plugin directory
 for file in "${FILES[@]}"
 do
-  echo "Copying file: $file";
+  echo "Copying file: $file --> $PLUGIN_DIR/$file";
   cp $SOURCE_DIR/$file $PLUGIN_DIR/$file;
 done
 echo "All files copied!";
