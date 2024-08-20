@@ -9,7 +9,7 @@ PLUGIN_DIR="/Users/willjasen/Obsidian/willjasen/.obsidian/plugins/obsidian-binar
 FILES=( "main.js" "manifest.json" "styles.css" );
 
 # Create the directory if needed
-[ -d $PLUGIN_DIR ] || mkdir $PLUGIN_DIR
+[ -d $PLUGIN_DIR ] || echo "Creating plugin directory at $PLUGIN_DIR"; mkdir $PLUGIN_DIR;
 
 # Go to the source directory and build it
 cd $SOURCE_DIR;
@@ -21,3 +21,4 @@ do
   echo "Copying file: $file";
   cp $SOURCE_DIR/$file $PLUGIN_DIR/$file;
 done
+echo "All files copied!";
