@@ -105,14 +105,14 @@ export class MetaDataGenerator {
     binaryFile: TFile
 	): Promise<void> {
 
+		
 		const binaryFileName = this.uniquefyBinaryFileName(
 			binaryFile.basename+"."+binaryFile.extension
 		);
-
-		// move binary file into attachments folder
 		const attachmentsFilePath = `${this.plugin.settings.attachmentsFilePath}`;
-		//const binaryFileName = binaryFile.basename+"."+binaryFile.extension;
 		const fullFilePath = attachmentsFilePath+"/"+binaryFileName;
+
+		// move binary file into the attachments folder
 		try {
 			await this.app.fileManager.renameFile(binaryFile, fullFilePath);
 			new Notice(`Binary file of ${binaryFileName} has been moved.`);
@@ -161,14 +161,19 @@ export class MetaDataGenerator {
 					{ target_file: targetFile, run_mode: 4 },
 					this.plugin.formatter.format(
 						templateContent,
-						binaryFile.path,
+						fullFilePath,
 						binaryFile.stat.ctime
 					)
 				);
 				this.app.vault.modify(targetFile, content);
+				try {
+					await this.moveBinaryFile(binaryFile);
+				} catch(err) {
+					alert(err);
+				}
 			} catch (err) {
 				new Notice(
-					'ERROR in Binary File Manager Plugin: failed to connect to Templater. Your Templater version may not be supported'
+					'ERROR in Binary File Manager Plugin: failed to connect to Templater. Your Templater version may not be supported.'
 				);
 				console.log(err);
 			}
