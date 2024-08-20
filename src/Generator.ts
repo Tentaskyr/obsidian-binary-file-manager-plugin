@@ -161,7 +161,7 @@ export class MetaDataGenerator {
 					{ target_file: targetFile, run_mode: 4 },
 					this.plugin.formatter.format(
 						templateContent,
-						fullFilePath,
+						binaryFile.path,
 						binaryFile.stat.ctime
 					)
 				);
