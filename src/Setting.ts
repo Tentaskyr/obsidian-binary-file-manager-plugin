@@ -122,29 +122,38 @@ export class BinaryFileManagerSettingTab extends PluginSettingTab {
 			});
 		});
 
+		// Create the "Use Templater" toggle setting
 		new Setting(containerEl)
-			.setName('Template file location')
-			.addSearch((component) => {
-				new FileSuggest(this.app, component.inputEl);
-				component
-					.setPlaceholder('Example: folder1/note')
-					.setValue(this.plugin.settings.templatePath)
-					.onChange((newTemplateFile) => {
-						this.plugin.settings.templatePath = newTemplateFile;
-						this.plugin.saveSettings();
-					});
-			});
+		.setName('Use Templater')
+		.addToggle(async (component) => {
+			component
+				.setValue(this.plugin.settings.useTemplater)
+				.onChange((value) => {
+					this.plugin.settings.useTemplater = value;
+					this.plugin.saveSettings();
+					
+					// Show or hide the Template file location setting based on the toggle value
+					templateSetting.settingEl.style.display = value ? 'block' : 'none';
+				});
+		});
 
-		new Setting(containerEl)
-			.setName('Use Templater')
-			.addToggle(async (component) => {
-				component
-					.setValue(this.plugin.settings.useTemplater)
-					.onChange((value) => {
-						this.plugin.settings.useTemplater = value;
-						this.plugin.saveSettings();
-					});
-			});
+		// Create the "Template file location" search setting and initially hide or show it
+		const templateSetting = new Setting(containerEl)
+		.setName('Template file location')
+		.addSearch((component) => {
+			new FileSuggest(this.app, component.inputEl);
+			component
+				.setPlaceholder('Example: folder1/note')
+				.setValue(this.plugin.settings.templatePath)
+				.onChange((newTemplateFile) => {
+					this.plugin.settings.templatePath = newTemplateFile;
+					this.plugin.saveSettings();
+				});
+		});
+
+		// Set the initial visibility of the "Template file location" setting
+		templateSetting.settingEl.style.display = this.plugin.settings.useTemplater ? 'block' : 'none';
+
 
 		let extensionToBeAdded: string;
 		new Setting(containerEl)
