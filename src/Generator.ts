@@ -9,7 +9,7 @@ import {
 	Plugin,
 } from 'obsidian';
 import { UncoveredApp } from 'Uncover';
-import { retry } from 'Util';
+import { retry, sleep } from 'Util';
 
 const TEMPLATER_PLUGIN_NAME = 'templater-obsidian';
 const DEFAULT_TEMPLATE_CONTENT = ``;
@@ -117,6 +117,7 @@ export class MetaDataGenerator {
 			await this.app.fileManager.renameFile(binaryFile, fullFilePath);
 			new Notice(`Binary file of ${binaryFileName} has been moved.`);
 		} catch (err) {
+			new Notice(`Problem moving the binary file of ${binaryFileName} into the attachments folder.`);
 			alert(err);
 		}
 	}
@@ -125,10 +126,19 @@ export class MetaDataGenerator {
 		metaDataFilePath: string,
 		binaryFile: TFile
 	): Promise<void> {
+
+		//  await sleep(1000);
+
 		const templateContent = await this.fetchTemplateContent();
 		const attachmentsFilePath = `${this.plugin.settings.attachmentsFilePath}`;
 		const binaryFileName = binaryFile.basename+"."+binaryFile.extension;
 		const fullFilePath = attachmentsFilePath+"/"+binaryFileName;
+
+		try {
+			await this.moveBinaryFile(binaryFile);
+		} catch(err) {
+			alert(err);
+		}
 
 		// process by Templater
 		const templaterPlugin = await this.getTemplaterPlugin();
@@ -141,12 +151,6 @@ export class MetaDataGenerator {
 					binaryFile.stat.ctime
 				)
 			);
-
-			try {
-				await this.moveBinaryFile(binaryFile);
-			} catch(err) {
-				alert(err);
-			}
 
 		} else {
 			const targetFile = await this.app.vault.create(
@@ -161,16 +165,12 @@ export class MetaDataGenerator {
 					{ target_file: targetFile, run_mode: 4 },
 					this.plugin.formatter.format(
 						templateContent,
-						fullFilePath,
+						binaryFile.path,
 						binaryFile.stat.ctime
 					)
 				);
 				this.app.vault.modify(targetFile, content);
-				try {
-					await this.moveBinaryFile(binaryFile);
-				} catch(err) {
-					alert(err);
-				}
+				
 			} catch (err) {
 				new Notice(
 					'ERROR in Binary File Manager Plugin: failed to connect to Templater. Your Templater version may not be supported.'

@@ -33,6 +33,10 @@ async function delay(milliSecond: number): Promise<undefined> {
 	return undefined;
 }
 
+export async function sleep(ms: number): Promise<void> {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 const INVALID_CHARS_IN_FILE_NAME = new Set<string>([
 	'\\',
 	'/',
