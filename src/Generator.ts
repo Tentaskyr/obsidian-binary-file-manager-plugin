@@ -117,6 +117,7 @@ export class MetaDataGenerator {
 			await this.app.fileManager.renameFile(binaryFile, fullFilePath);
 			new Notice(`Binary file of ${binaryFileName} has been moved.`);
 		} catch (err) {
+			new Notice(`Problem moving the binary file of ${binaryFileName} into the attachments folder.`);
 			alert(err);
 		}
 	}
@@ -126,12 +127,18 @@ export class MetaDataGenerator {
 		binaryFile: TFile
 	): Promise<void> {
 
-		await sleep(5000);
+		//  await sleep(1000);
 
 		const templateContent = await this.fetchTemplateContent();
 		const attachmentsFilePath = `${this.plugin.settings.attachmentsFilePath}`;
 		const binaryFileName = binaryFile.basename+"."+binaryFile.extension;
 		const fullFilePath = attachmentsFilePath+"/"+binaryFileName;
+
+		try {
+			await this.moveBinaryFile(binaryFile);
+		} catch(err) {
+			alert(err);
+		}
 
 		// process by Templater
 		const templaterPlugin = await this.getTemplaterPlugin();
@@ -144,12 +151,6 @@ export class MetaDataGenerator {
 					binaryFile.stat.ctime
 				)
 			);
-
-			try {
-				await this.moveBinaryFile(binaryFile);
-			} catch(err) {
-				alert(err);
-			}
 
 		} else {
 			const targetFile = await this.app.vault.create(
@@ -169,11 +170,7 @@ export class MetaDataGenerator {
 					)
 				);
 				this.app.vault.modify(targetFile, content);
-				try {
-					await this.moveBinaryFile(binaryFile);
-				} catch(err) {
-					alert(err);
-				}
+				
 			} catch (err) {
 				new Notice(
 					'ERROR in Binary File Manager Plugin: failed to connect to Templater. Your Templater version may not be supported.'
