@@ -1,17 +1,18 @@
 name: Build Obsidian plugin
 
 on:
-  workflow_dispatch: {}
+  workflow_dispatch: {}   # manual run
   push:
-    branches: [dev]
+    branches: [dev]       # optional: auto-build on dev
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout upstream dev
+      - name: Checkout upstream dev (or your fork's dev)
         uses: actions/checkout@v4
         with:
+          # If building your fork, remove the next two lines.
           repository: willjasen/obsidian-binary-file-manager-plugin
           ref: dev
           fetch-depth: 0
@@ -22,20 +23,17 @@ jobs:
         with:
           node-version: 20
 
-      - name: Install deps
+      # 👇 Bypass package scripts & config that try to use `watch`
+      - name: Build with esbuild CLI (no watch)
         run: |
-          if [ -f package-lock.json ]; then npm ci; else npm install; fi
-
-      - name: Build
-        run: |
-          if npm run | grep -q " build"; then
-            npm run build
-          else
-            npx esbuild src/main.ts \
-              --bundle --outfile=main.js \
-              --format=cjs --platform=browser \
-              --external:obsidian --external:electron
-          fi
+          npx --yes esbuild@0.21.5 src/main.ts \
+            --bundle \
+            --outfile=main.js \
+            --format=cjs \
+            --platform=browser \
+            --target=es2020 \
+            --external:obsidian \
+            --external:electron
 
       - name: Upload plugin files
         uses: actions/upload-artifact@v4
