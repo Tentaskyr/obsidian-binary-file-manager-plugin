@@ -1,0 +1,48 @@
+name: Build Obsidian plugin
+
+on:
+  workflow_dispatch: {}
+  push:
+    branches: [dev]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout upstream dev
+        uses: actions/checkout@v4
+        with:
+          repository: willjasen/obsidian-binary-file-manager-plugin
+          ref: dev
+          fetch-depth: 0
+          lfs: true
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install deps
+        run: |
+          if [ -f package-lock.json ]; then npm ci; else npm install; fi
+
+      - name: Build
+        run: |
+          if npm run | grep -q " build"; then
+            npm run build
+          else
+            npx esbuild src/main.ts \
+              --bundle --outfile=main.js \
+              --format=cjs --platform=browser \
+              --external:obsidian --external:electron
+          fi
+
+      - name: Upload plugin files
+        uses: actions/upload-artifact@v4
+        with:
+          name: obsidian-binary-file-manager-plugin
+          path: |
+            manifest.json
+            main.js
+            styles.css
+          if-no-files-found: warn
